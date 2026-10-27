@@ -1,0 +1,170 @@
+/* Importazione del font moderno sans-serif 'Inter' da Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* STILE COMUNE */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #F1F3F5; /* Sfondo pagina da mockup */
+    color: #1F2328;            /* Testo primario */
+    margin: 0;
+    padding: 0 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+/* Titolo H1 */
+h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 24px;
+    text-align: center;
+    color: #1F2328;
+}
+
+/* Box bianco principale (utilizzato sia per il form che per il risultato) */
+.box {
+    width: 360px;
+    max-width: 100%;
+    padding: 24px;
+    border-radius: 12px;
+    background-color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Ombra leggera */
+    box-sizing: border-box;
+    text-align: center;
+}
+
+/* Stile per i gruppi del form */
+form p {
+    margin: 0 0 16px 0;
+    text-align: left;
+}
+
+label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #1F2328;
+}
+
+/* Campi di input */
+input[type="text"],
+input[type="number"] {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: inherit;
+    border: 1px solid #D0D7DE;
+    border-radius: 6px;
+    box-sizing: border-box;
+    outline: none;
+    background-color: #FFFFFF;
+    transition: border-color 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+    border-color: #1F2328;
+}
+
+/* Pulsante Submit "Calcola BMI" */
+input[type="submit"] {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #1F2328;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: opacity 0.2s ease;
+}
+
+input[type="submit"]:hover {
+    opacity: 0.9;
+}
+
+/* STILI SPECIFICI PER LA CARD RISULTATO IN calcola.php */
+.nome-utente {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #1F2328;
+}
+
+.dati-inseriti {
+    font-size: 14px;
+    color: #57606A;
+    margin-bottom: 16px;
+}
+
+.valore-bmi {
+    font-size: 48px;
+    font-weight: 800;
+    color: #1F2328;
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
+.testo-fascia {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* LE QUATTRO CLASSI DELLA CARD (COME DA MOCKUP) */
+.box.sottopeso {
+    background-color: #E3EEF9;
+    border: 3px solid #2F6FB3;
+}
+.box.sottopeso .testo-fascia {
+    color: #2F6FB3;
+}
+
+.box.normopeso {
+    background-color: #E3F4E6;
+    border: 3px solid #256D34;
+}
+.box.normopeso .testo-fascia {
+    color: #256D34;
+}
+
+.box.sovrappeso {
+    background-color: #FCEBD7;
+    border: 3px solid #9A4F06;
+}
+.box.sovrappeso .testo-fascia {
+    color: #9A4F06;
+}
+
+.box.obesita {
+    background-color: #FBE2E2;
+    border: 3px solid #B32D2D;
+}
+.box.obesita .testo-fascia {
+    color: #B32D2D;
+}
+
+/* Link sotto la card per ricalcolare */
+.link-riprova {
+    display: inline-block;
+    margin-top: 20px;
+    color: #1F2328;
+    font-size: 14px;
+    text-decoration: underline;
+}
+
+.link-riprova:hover {
+    color: #000000;
+}
