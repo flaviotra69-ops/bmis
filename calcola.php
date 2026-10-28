@@ -7,8 +7,8 @@ $bmi = 0;
 $classe_fascia = "";
 $nome_fascia = "";
 // Controlla se la pagina è stata richiamata tramite il metodo POST.
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Recupera il nome inviato dal form, elimina gli spazi iniziali e finali
     // e converte i caratteri speciali in entità HTML.
     $nome = isset($_POST['name']) ? trim(htmlspecialchars($_POST['name'])) : '';
@@ -99,41 +99,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <!DOCTYPE html>
-<!-- Indica che il documento utilizza HTML5 e la lingua italiana. -->
 <html lang="it">
-
 <head>
-    <!-- Definisce la codifica dei caratteri utilizzata nella pagina. -->
     <meta charset="UTF-8">
-
-    <!-- Adatta la larghezza della pagina al dispositivo utilizzato. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Definisce il titolo mostrato nella scheda del browser. -->
     <title>Risultato BMI</title>
-
-    <!-- Collega il foglio di stile esterno alla pagina. -->
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
     <!-- Controlla se è presente un messaggio di errore. -->
     <?php if ($errore): ?>
-
-        <!-- Visualizza il contenitore con lo stile previsto per l'errore. -->
         <div class="box obesita">
-
-            <!-- Mostra il titolo della pagina di errore. -->
             <h1>Errore</h1>
-
-            <!-- Mostra il messaggio di errore in rosso e in grassetto. -->
             <p style="font-weight: bold; color: #B32D2D;">
                 <?php echo $errore; ?>
             </p>
-
-            <!-- Permette di tornare al modulo di inserimento. -->
-            <a href="index.html" class="link-riprova">
+            <a href="index.html">
                 Torna indietro
             </a>
 
@@ -141,46 +122,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <!-- Se non ci sono errori, mostra il risultato del calcolo. -->
     <?php else: ?>
-
-        <!-- Crea la card e assegna la classe CSS corrispondente alla fascia. -->
         <div class="box <?php echo $classe_fascia; ?>">
-
-            <!-- Visualizza il nome dell'utente. -->
             <div class="nome-utente">
                 <?php echo $nome; ?>
             </div>
-
-            <!-- Visualizza il peso e l'altezza inseriti. -->
             <div class="dati-inseriti">
                 <?php echo $peso; ?> kg, <?php echo $altezza_cm; ?> cm
             </div>
-
-            <!-- Visualizza il BMI con due cifre decimali e la virgola. -->
             <div class="valore-bmi">
                 <?php echo number_format($bmi, 2, ',', ''); ?>
             </div>
-
-            <!-- Visualizza il nome descrittivo della fascia. -->
             <div class="testo-fascia">
                 <?php echo $nome_fascia; ?>
             </div>
-
-            <!-- Inserisce un'interruzione di riga HTML. -->
             <br>
-
-            <!-- Permette di tornare al modulo per eseguire un nuovo calcolo. -->
             <a href="index.html" class="link-riprova">
                 Calcola di nuovo
             </a>
-
-        <!-- Chiude il contenitore del risultato. -->
         </div>
-
-    <!-- Chiude la condizione PHP. -->
     <?php endif; ?>
-
-<!-- Chiude il corpo della pagina HTML. -->
 </body>
-
-<!-- Chiude il documento HTML. -->
 </html>
