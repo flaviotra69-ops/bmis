@@ -1,5 +1,4 @@
 <?php
-// Inizializzazione della variabile per eventuali messaggi di errore
 $errore = null;
 $nome = "";
 $peso = "";
@@ -7,115 +6,181 @@ $altezza_cm = "";
 $bmi = 0;
 $classe_fascia = "";
 $nome_fascia = "";
-
-// Verifica se la pagina è stata richiamata inviando i dati tramite il metodo POST
+// Controlla se la pagina è stata richiamata tramite il metodo POST.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // se presente, rimuove spazi e converte caratteri speciali
+
+    // Recupera il nome inviato dal form, elimina gli spazi iniziali e finali
+    // e converte i caratteri speciali in entità HTML.
     $nome = isset($_POST['name']) ? trim(htmlspecialchars($_POST['name'])) : '';
-    // Recupera il campo 'weight' e lo converte in un numero decimale, se assente imposta 0
-    $peso = isset($_POST['weight']) ? floatval($_POST['weight']) : 0;
-    // Recupera il campo 'height' e lo converte in un numero decimale,  se assente imposta 0
-    $altezza_cm = isset($_POST['height']) ? floatval($_POST['height']) : 0;
-    // Controlla se i dati inseriti sono validi
-    if (empty($nome) || $peso <= 0 || $altezza_cm <= 0) {
-        
-        // Se uno dei dati è errato, memorizza il messaggio di errore da mostrare all'utente
+    // Recupera il peso inviato dal form, se il campo esiste.
+    $peso_input = isset($_POST['weight']) ? trim($_POST['weight']) : '';
+    // Recupera l'altezza inviata dal form, se il campo esiste.
+    $altezza_input = isset($_POST['height']) ? trim($_POST['height']) : '';
+    // Controlla se il peso è numerico; se lo è, lo converte in numero decimale.
+    // Altrimenti assegna zero alla variabile $peso.
+
+    $peso = is_numeric($peso_input) ? floatval($peso_input) : 0;
+    // Controlla se l'altezza è numerica e la converte in numero decimale.
+    // Se non è numerica, assegna zero alla variabile $altezza_cm.
+    $altezza_cm = is_numeric($altezza_input) ? floatval($altezza_input) : 0;
+    $nome_valido = !empty($nome);
+    $peso_valido = is_numeric($peso_input) && $peso > 0;
+    $altezza_valida = is_numeric($altezza_input) && $altezza_cm > 0;
+    // Se il campo è valido, prepara il relativo nome per il log
+    // Altrimenti assegna la stringa NOT_VALID.
+    $log_nome = $nome_valido ? $nome : "NOT_VALID";
+    $log_peso = $peso_valido ? $peso : "NOT_VALID";
+    $log_altezza = $altezza_valida ? $altezza_cm : "NOT_VALID";
+    // Controlla se almeno uno dei tre dati inseriti non è valido.
+    if (!$nome_valido || !$peso_valido || !$altezza_valida) {
+        // Printare il messaggio di errore da visualizzare nella pagina.
         $errore = "Inserisci valori validi";
-        // "NOT_VALID" da scrivere nel log CSV per i campi non corretti
-        $log_nome = empty($nome) ? "NOT_VALID" : $nome;
-        $log_peso = ($peso <= 0) ? "NOT_VALID" : $peso;
-        $log_altezza = ($altezza_cm <= 0) ? "NOT_VALID" : $altezza_cm;
+        // Registra NOT_VALID per il BMI perché non può essere calcolato.
         $log_bmi = "NOT_VALID";
+        // Registra NOT_VALID per la fascia perché non può essere determinata.
         $log_fascia = "NOT_VALID";
-
     } else {
-        // Se i dati sono corretti: converte l'altezza da centimetri a metri per la formula del BMI
+        // Converte l'altezza da centimetri a metri dividendo per 100.
         $altezza_m = $altezza_cm / 100;
-
-        // Calcola l'indice di massa corporea con la formula: Peso / (Altezza * Altezza)
+        // Calcola il BMI dividendo il peso per il quadrato dell'altezza in metri.
         $bmi = $peso / ($altezza_m * $altezza_m);
-
-        // Classificazione del valore BMI ottenuto nelle varie categorie di peso
+        // Controlla se il BMI è inferiore a 18,5.
         if ($bmi < 18.5) {
-            // Caso BMI minore di 18.5
-            $classe_fascia = "sottopeso"; // Nome della classe CSS per lo stile visuale
-            $nome_fascia   = "Sottopeso"; // Testo descrittivo stampato a schermo
+            // Assegna la classe CSS relativa al sottopeso.
+            $classe_fascia = "sottopeso";
+            // Assegna il testo da visualizzare nella pagina.
+            $nome_fascia = "Sottopeso";
+        // Se la condizione precedente è falsa, controlla se il BMI è al massimo 24,9.
         } elseif ($bmi <= 24.9) {
-            // Caso BMI compreso tra 18.5 e 24.9
+            // Assegna la classe CSS relativa al normopeso.
             $classe_fascia = "normopeso";
-            $nome_fascia   = "Normopeso";
+            // Assegna il testo da visualizzare nella pagina.
+            $nome_fascia = "Normopeso";
+        // Se le condizioni precedenti sono false, controlla se il BMI è al massimo 29,9.
         } elseif ($bmi <= 29.9) {
-            // Caso BMI compreso tra 25.0 e 29.9
+            // Assegna la classe CSS relativa al sovrappeso.
             $classe_fascia = "sovrappeso";
-            $nome_fascia   = "Sovrappeso";
+            // Assegna il testo da visualizzare nella pagina.
+            $nome_fascia = "Sovrappeso";
+        // Se nessuna delle condizioni precedenti è vera, il BMI è almeno 30.
         } else {
-            // Caso BMI maggiore o uguale a 30.0
+            // Assegna la classe CSS relativa alla categoria obesità.
             $classe_fascia = "obesita";
-            $nome_fascia   = "Obesità";
+            // Assegna il testo da visualizzare nella pagina.
+            $nome_fascia = "Obesità";
         }
-
-        // Assegna i valori validi formattati pronti per essere salvati nel CSV
-        $log_nome = $nome;
-        $log_peso = $peso;
-        $log_altezza = $altezza_cm;
-        $log_bmi = round($bmi, 2); // Arrotonda il BMI a 2 cifre decimali
+        // Arrotonda il BMI a due cifre decimali per registrarlo nel log.
+        $log_bmi = round($bmi, 2);
+        // Salva nel log il nome della classe assegnata al risultato.
         $log_fascia = $classe_fascia;
     }
-
-    // Apre il file "log.csv" in modalità 'append' ("a") per aggiungere la nuova riga alla fine del file
+    // Apre il file log.csv in modalità append per aggiungere un nuovo record.
     $log = fopen("log.csv", "a");
-
+    // Controlla se il file è stato aperto correttamente.
     if ($log) {
-        $record = date("d/m/Y").",".date("H:i:s").",".$_SERVER["REMOTE_ADDR"].",".$log_nome.",".$log_peso.",".$log_altezza.",".$log_bmi.",".$log_fascia;
-        fwrite($log, $record);
 
+        // Costruisce una riga CSV con data, ora, IP, nome, peso, altezza, BMI e fascia.
+        // PHP_EOL aggiunge un'interruzione di riga, per andare a capo
+        $record = date("d/m/Y").",".date("H:i:s").",".$_SERVER["REMOTE_ADDR"].",".$log_nome.",".$log_peso.",".$log_altezza.",".$log_bmi.",".$log_fascia.PHP_EOL;
+
+        // Scrive la riga costruita all'interno del file CSV.
+        fwrite($log, $record);
+        // Chiude il file dopo aver scritto il record.
         fclose($log);
     }
+
+// Se la pagina non è stata richiamata tramite POST, esegue il blocco else.
 } else {
-    // Se l'utente tenta di accedere direttamente alla pagina calcola.php senza inviare il form, viene reindirizzato alla home
+    // Reindirizza l'utente alla pagina iniziale.
     header('Location: index.html');
-    exit; // Interrompe l'esecuzione dello script dopo il reindirizzamento
+    // Interrompe l'esecuzione del programma dopo il reindirizzamento.
+    exit;
 }
 ?>
+
 <!DOCTYPE html>
+<!-- Indica che il documento utilizza HTML5 e la lingua italiana. -->
 <html lang="it">
+
 <head>
+    <!-- Definisce la codifica dei caratteri utilizzata nella pagina. -->
     <meta charset="UTF-8">
+
+    <!-- Adatta la larghezza della pagina al dispositivo utilizzato. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Definisce il titolo mostrato nella scheda del browser. -->
     <title>Risultato BMI</title>
-    <!-- Collegamento al foglio di stile esterno CSS -->
+
+    <!-- Collega il foglio di stile esterno alla pagina. -->
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-    <!-- Controllo se è presente un errore di inserimento dati -->
+    <!-- Controlla se è presente un messaggio di errore. -->
     <?php if ($errore): ?>
-        <!-- Blocco HTML per la visualizzazione del messaggio di errore -->
+
+        <!-- Visualizza il contenitore con lo stile previsto per l'errore. -->
         <div class="box obesita">
+
+            <!-- Mostra il titolo della pagina di errore. -->
             <h1>Errore</h1>
-            <p style="font-weight: bold; color: #B32D2D;"><?php echo $errore; ?></p>
-            <a href="index.html" class="link-riprova">Torna indietro</a>
+
+            <!-- Mostra il messaggio di errore in rosso e in grassetto. -->
+            <p style="font-weight: bold; color: #B32D2D;">
+                <?php echo $errore; ?>
+            </p>
+
+            <!-- Permette di tornare al modulo di inserimento. -->
+            <a href="index.html" class="link-riprova">
+                Torna indietro
+            </a>
+
         </div>
+
+    <!-- Se non ci sono errori, mostra il risultato del calcolo. -->
     <?php else: ?>
-        <!-- Blocco HTML per la visualizzazione della card con il risultato finale -->
+
+        <!-- Crea la card e assegna la classe CSS corrispondente alla fascia. -->
         <div class="box <?php echo $classe_fascia; ?>">
-            <!-- Stampa il nome inserito dall'utente -->
-            <div class="nome-utente"><?php echo $nome; ?></div>
 
-            <!-- Stampa i dati di peso e altezza inseriti -->
-            <div class="dati-inseriti"><?php echo $peso; ?> kg, <?php echo $altezza_cm; ?> cm</div>
+            <!-- Visualizza il nome dell'utente. -->
+            <div class="nome-utente">
+                <?php echo $nome; ?>
+            </div>
 
-            <!-- Formatta il BMI con la virgola decimali e 2 cifre e lo mostra a schermo -->
-            <div class="valore-bmi"><?php echo number_format($bmi, 2, ',', ''); ?></div>
+            <!-- Visualizza il peso e l'altezza inseriti. -->
+            <div class="dati-inseriti">
+                <?php echo $peso; ?> kg, <?php echo $altezza_cm; ?> cm
+            </div>
 
-            <!-- Stampa il nome della fascia (es. Sottopeso, Normopeso...) -->
-            <div class="testo-fascia"><?php echo $nome_fascia; ?></div>
+            <!-- Visualizza il BMI con due cifre decimali e la virgola. -->
+            <div class="valore-bmi">
+                <?php echo number_format($bmi, 2, ',', ''); ?>
+            </div>
 
+            <!-- Visualizza il nome descrittivo della fascia. -->
+            <div class="testo-fascia">
+                <?php echo $nome_fascia; ?>
+            </div>
+
+            <!-- Inserisce un'interruzione di riga HTML. -->
             <br>
-            <!-- Pulsante per tornare al form e calcolare nuovamente -->
-            <a href="index.html" class="link-riprova">Calcola di nuovo</a>
+
+            <!-- Permette di tornare al modulo per eseguire un nuovo calcolo. -->
+            <a href="index.html" class="link-riprova">
+                Calcola di nuovo
+            </a>
+
+        <!-- Chiude il contenitore del risultato. -->
         </div>
+
+    <!-- Chiude la condizione PHP. -->
     <?php endif; ?>
 
+<!-- Chiude il corpo della pagina HTML. -->
 </body>
+
+<!-- Chiude il documento HTML. -->
 </html>
